@@ -37,6 +37,10 @@
       (buffer-string))))
 
 (defun dedent-string (s &optional first)
+  "Move the starting column of S to FIRST and maintain the
+relative indentation of subsequent lines.  If a subsequent line
+is indented less than the first line, then the first line will be
+moved right to accomodate."
   (let* ((s (dedent-prepare-string s first))
          (amt (loop
                with start = 0
@@ -63,8 +67,14 @@ code to a finicky REPL."
       (forward-line))
     (buffer-string)))
 
-(defun dedent-kill (kill-fn &optional extend-indentation)
-  "Execute KILL-FN and then dedent the top entry in the kill-ring."
+(defun dedent-kill (&optional extend-indentation kill-fn)
+  "Kill text and then dedent the top entry in the kill-ring.  If
+EXTEND-INDENTATION is non-nil, dedent-extend-indentation will be
+used. Optional argument KILL-FN specifies which function to use
+while killing text."
+  (interactive)
+  (unless kill-fn
+    (setq kill-fn 'copy-region-as-kill))
   (let ((col (save-excursion
                (save-restriction
                  (widen)
@@ -104,4 +114,5 @@ Maintain relative indentation on all subsequent lines."
 
 
 (provide 'dedent)
+
 ;;; dedent.el ends here
